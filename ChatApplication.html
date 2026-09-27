@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Chat App</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#e9eef3;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.chat-app{
+    width:95%;
+    max-width:1000px;
+    height:92vh;
+    background:white;
+    border-radius:18px;
+    overflow:hidden;
+    display:flex;
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:280px;
+    background:#17212b;
+    color:white;
+    padding:20px;
+}
+
+.profile{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:25px;
+}
+
+.avatar{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    background:#00a884;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.profile h3{
+    font-size:17px;
+}
+
+.online{
+    color:#57d68d;
+    font-size:13px;
+}
+
+.search{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    outline:none;
+    margin-bottom:20px;
+}
+
+.contact{
+    padding:15px;
+    border-radius:10px;
+    background:#263746;
+    cursor:pointer;
+}
+
+.contact:hover{
+    background:#30495c;
+}
+
+.contact h4{
+    margin-bottom:4px;
+}
+
+.contact small{
+    color:#b9c6d0;
+}
+
+/* MAIN */
+.main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+}
+
+.chat-header{
+    height:75px;
+    background:#075e54;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 20px;
+}
+
+.user-info{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.header-avatar{
+    width:45px;
+    height:45px;
+    background:#00a884;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.header-text h3{
+    font-size:17px;
+}
+
+.header-text p{
+    font-size:12px;
+    color:#d4f5ed;
+}
+
+.buttons{
+    display:flex;
+    gap:8px;
+}
+
+.icon-btn{
+    border:none;
+    background:rgba(255,255,255,.15);
+    color:white;
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:17px;
+}
+
+.icon-btn:hover{
+    background:rgba(255,255,255,.3);
+}
+
+/* MESSAGES */
+.messages{
+    flex:1;
+    overflow-y:auto;
+    padding:25px;
+    background:#efeae2;
+}
+
+.message{
+    max-width:70%;
+    padding:10px 13px;
+    margin-bottom:12px;
+    border-radius:10px;
+    position:relative;
+    word-wrap:break-word;
+}
+
+.received{
+    background:white;
+    margin-right:auto;
+    border-top-left-radius:2px;
+}
+
+.sent{
+    background:#d9fdd3;
+    margin-left:auto;
+    border-top-right-radius:2px;
+}
+
+.message-name{
+    color:#008069;
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:4px;
+}
+
+.message-text{
+    font-size:15px;
+    line-height:1.4;
+}
+
+.message-time{
+    font-size:10px;
+    color:#777;
+    text-align:right;
+    margin-top:5px;
+}
+
+.delete-btn{
+    border:none;
+    background:none;
+    color:#888;
+    cursor:pointer;
+    margin-left:8px;
+}
+
+/* INPUT */
+.input-area{
+    padding:12px;
+    background:#f0f2f5;
+    display:flex;
+    gap:8px;
+    align-items:center;
+}
+
+.emoji-btn{
+    border:none;
+    background:white;
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:21px;
+}
+
+#messageInput{
+    flex:1;
+    border:none;
+    outline:none;
+    padding:13px 16px;
+    border-radius:25px;
+    font-size:15px;
+}
+
+.send-btn{
+    width:50px;
+    height:50px;
+    border:none;
+    border-radius:50%;
+    background:#00a884;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.send-btn:hover{
+    background:#008f72;
+}
+
+/* EMOJI */
+.emoji-box{
+    display:none;
+    position:absolute;
+    bottom:80px;
+    background:white;
+    padding:12px;
+    border-radius:12px;
+    box-shadow:0 5px 20px rgba(0,0,0,.2);
+    width:250px;
+}
+
+.emoji-box span{
+    font-size:23px;
+    cursor:pointer;
+    padding:5px;
+}
+
+/* DARK MODE */
+.dark{
+    background:#111;
+}
+
+.dark .chat-app{
+    background:#222;
+}
+
+.dark .messages{
+    background:#181818;
+}
+
+.dark .input-area{
+    background:#222;
+}
+
+.dark #messageInput{
+    background:#333;
+    color:white;
+}
+
+.dark .received{
+    background:#2c2c2c;
+    color:white;
+}
+
+/* MOBILE */
+@media(max-width:700px){
+
+    body{
+        align-items:stretch;
+    }
+
+    .chat-app{
+        width:100%;
+        height:100vh;
+        border-radius:0;
+    }
+
+    .sidebar{
+        display:none;
+    }
+
+    .message{
+        max-width:85%;
+    }
+
+    .chat-header{
+        height:65px;
+    }
+
+    .messages{
+        padding:15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="chat-app">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+        <div class="profile">
+            <div class="avatar" id="profileAvatar">I</div>
+
+            <div>
+                <h3 id="profileName">Ibrahim</h3>
+                <span class="online">● Online</span>
+            </div>
+        </div>
+
+        <input
+            type="text"
+            class="search"
+            id="searchInput"
+            placeholder="Search messages..."
+        >
+
+        <div class="contact">
+            <h4>💬 General Chat</h4>
+            <small>Start chatting...</small>
+        </div>
+
+    </div>
+
+
+    <!-- MAIN CHAT -->
+    <div class="main">
+
+        <div class="chat-header">
+
+            <div class="user-info">
+
+                <div class="header-avatar">
+                    👤
+                </div>
+
+                <div class="header-text">
+                    <h3>General Chat</h3>
+                    <p>● Online</p>
+                </div>
+
+            </div>
+
+            <div class="buttons">
+
+                <button
+                    class="icon-btn"
+                    onclick="changeName()"
+                    title="Change username">
+                    👤
+                </button>
+
+                <button
+                    class="icon-btn"
+                    onclick="toggleDark()"
+                    title="Dark mode">
+                    🌙
+                </button>
+
+                <button
+                    class="icon-btn"
+                    onclick="clearChat()"
+                    title="Clear chat">
+                    🗑️
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- MESSAGES -->
+        <div class="messages" id="messages"></div>
+
+
+        <!-- INPUT -->
+        <div class="input-area">
+
+            <button
+                class="emoji-btn"
+                onclick="toggleEmoji()">
+                😊
+            </button>
+
+            <input
+                type="text"
+                id="messageInput"
+                placeholder="Type a message..."
+                autocomplete="off"
+            >
+
+            <button
+                class="send-btn"
+                onclick="sendMessage()">
+                ➤
+            </button>
+
+        </div>
+
+        <div class="emoji-box" id="emojiBox">
+
+            <span onclick="addEmoji('😀')">😀</span>
+            <span onclick="addEmoji('😂')">😂</span>
+            <span onclick="addEmoji('😍')">😍</span>
+            <span onclick="addEmoji('😊')">😊</span>
+            <span onclick="addEmoji('😎')">😎</span>
+            <span onclick="addEmoji('❤️')">❤️</span>
+            <span onclick="addEmoji('👍')">👍</span>
+            <span onclick="addEmoji('🔥')">🔥</span>
+            <span onclick="addEmoji('🎉')">🎉</span>
+            <span onclick="addEmoji('🙏')">🙏</span>
+            <span onclick="addEmoji('🤣')">🤣</span>
+            <span onclick="addEmoji('🥳')">🥳</span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let username = localStorage.getItem("chatUsername") || "Ibrahim";
+
+let messages =
+    JSON.parse(localStorage.getItem("chatMessages")) || [];
+
+
+document.getElementById("profileName").innerText = username;
+
+document.getElementById("profileAvatar").innerText =
+    username.charAt(0).toUpperCase();
+
+
+function saveMessages(){
+
+    localStorage.setItem(
+        "chatMessages",
+        JSON.stringify(messages)
+    );
+}
+
+
+function displayMessages(list = messages){
+
+    const container =
+        document.getElementById("messages");
+
+    container.innerHTML = "";
+
+    list.forEach((msg,index)=>{
+
+        const div = document.createElement("div");
+
+        div.className =
+            "message " +
+            (msg.sender === username
+                ? "sent"
+                : "received");
+
+        div.innerHTML = `
+
+            <div class="message-name">
+                ${escapeHTML(msg.sender)}
+            </div>
+
+            <div class="message-text">
+                ${escapeHTML(msg.text)}
+            </div>
+
+            <div class="message-time">
+
+                ${msg.time}
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteMessage(${index})">
+                    ✕
+                </button>
+
+            </div>
+        `;
+
+        container.appendChild(div);
+
+    });
+
+    container.scrollTop = container.scrollHeight;
+}
+
+
+function sendMessage(){
+
+    const input =
+        document.getElementById("messageInput");
+
+    const text = input.value.trim();
+
+    if(text === ""){
+        return;
+    }
+
+    const now = new Date();
+
+    const time =
+        now.toLocaleTimeString([],{
+            hour:"2-digit",
+            minute:"2-digit"
+        });
+
+    messages.push({
+
+        sender:username,
+
+        text:text,
+
+        time:time
+
+    });
+
+    saveMessages();
+
+    displayMessages();
+
+    input.value = "";
+
+    input.focus();
+
+}
+
+
+function deleteMessage(index){
+
+    if(confirm("Delete this message?")){
+
+        messages.splice(index,1);
+
+        saveMessages();
+
+        displayMessages();
+    }
+
+}
+
+
+function clearChat(){
+
+    if(confirm("Delete all messages?")){
+
+        messages = [];
+
+        saveMessages();
+
+        displayMessages();
+    }
+
+}
+
+
+function changeName(){
+
+    const newName =
+        prompt("Enter your username:",username);
+
+    if(newName && newName.trim() !== ""){
+
+        username = newName.trim();
+
+        localStorage.setItem(
+            "chatUsername",
+            username
+        );
+
+        document.getElementById(
+            "profileName"
+        ).innerText = username;
+
+        document.getElementById(
+            "profileAvatar"
+        ).innerText =
+            username.charAt(0).toUpperCase();
+
+        displayMessages();
+    }
+
+}
+
+
+function toggleDark(){
+
+    document.body.classList.toggle("dark");
+
+}
+
+
+function toggleEmoji(){
+
+    const box =
+        document.getElementById("emojiBox");
+
+    box.style.display =
+        box.style.display === "block"
+        ? "none"
+        : "block";
+}
+
+
+function addEmoji(emoji){
+
+    const input =
+        document.getElementById("messageInput");
+
+    input.value += emoji;
+
+    input.focus();
+
+    document.getElementById(
+        "emojiBox"
+    ).style.display = "none";
+}
+
+
+document.getElementById(
+    "messageInput"
+).addEventListener("keydown",function(event){
+
+    if(event.key === "Enter"){
+
+        sendMessage();
+
+    }
+
+});
+
+
+document.getElementById(
+    "searchInput"
+).addEventListener("input",function(){
+
+    const keyword =
+        this.value.toLowerCase();
+
+    const filtered =
+        messages.filter(msg =>
+            msg.text.toLowerCase()
+            .includes(keyword)
+        );
+
+    displayMessages(filtered);
+
+});
+
+
+function escapeHTML(text){
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+}
+
+
+displayMessages();
+
+</script>
+
+</body>
+</html>
