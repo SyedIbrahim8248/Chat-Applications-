@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Two Side Chat App</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial;
+}
+
+body{
+    background:#d9dbd5;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.chat{
+    width:100%;
+    max-width:700px;
+    height:95vh;
+    background:#efeae2;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 5px 25px #555;
+}
+
+/* HEADER */
+
+.header{
+    background:#075e54;
+    color:white;
+    padding:15px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.user{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.avatar{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    background:#00a884;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:22px;
+}
+
+.header h3{
+    font-size:17px;
+}
+
+.status{
+    font-size:12px;
+    color:#c8f7ed;
+}
+
+.switch{
+    background:white;
+    color:#075e54;
+    border:0;
+    padding:8px 12px;
+    border-radius:20px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* CHAT AREA */
+
+.messages{
+    flex:1;
+    padding:20px;
+    overflow-y:auto;
+}
+
+.message{
+    max-width:70%;
+    padding:10px 13px;
+    margin-bottom:12px;
+    border-radius:10px;
+    word-wrap:break-word;
+}
+
+.left{
+    background:white;
+    margin-right:auto;
+}
+
+.right{
+    background:#d9fdd3;
+    margin-left:auto;
+}
+
+.name{
+    font-size:12px;
+    color:#008069;
+    font-weight:bold;
+    margin-bottom:4px;
+}
+
+.text{
+    font-size:15px;
+}
+
+.time{
+    font-size:10px;
+    color:#777;
+    text-align:right;
+    margin-top:5px;
+}
+
+/* INPUT */
+
+.input{
+    background:#f0f2f5;
+    padding:12px;
+    display:flex;
+    gap:8px;
+}
+
+.input input{
+    flex:1;
+    border:0;
+    outline:0;
+    padding:13px 18px;
+    border-radius:25px;
+    font-size:15px;
+}
+
+.send{
+    width:48px;
+    height:48px;
+    border:0;
+    border-radius:50%;
+    background:#00a884;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.send:hover{
+    background:#008f72;
+}
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+    .chat{
+        height:100vh;
+    }
+
+    .message{
+        max-width:85%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="chat">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="user">
+
+            <div class="avatar" id="avatar">
+                👤
+            </div>
+
+            <div>
+                <h3 id="chatTitle">
+                    Rahul
+                </h3>
+
+                <div class="status">
+                    ● Online
+                </div>
+            </div>
+
+        </div>
+
+        <button class="switch"
+                onclick="switchUser()">
+            Switch User
+        </button>
+
+    </div>
+
+
+    <!-- MESSAGES -->
+
+    <div class="messages" id="messages">
+    </div>
+
+
+    <!-- INPUT -->
+
+    <div class="input">
+
+        <input
+            id="messageInput"
+            placeholder="Type a message..."
+            autocomplete="off"
+        >
+
+        <button
+            class="send"
+            onclick="sendMessage()">
+            ➤
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let currentUser = "Ibrahim";
+
+let messages = [];
+
+
+/* SWITCH USER */
+
+function switchUser(){
+
+    if(currentUser === "Ibrahim"){
+
+        currentUser = "Rahul";
+
+    }else{
+
+        currentUser = "Ibrahim";
+
+    }
+
+    document.getElementById("chatTitle").innerText =
+        currentUser === "Ibrahim"
+        ? "Rahul"
+        : "Ibrahim";
+
+    displayMessages();
+}
+
+
+/* SEND MESSAGE */
+
+function sendMessage(){
+
+    let input =
+        document.getElementById("messageInput");
+
+    let text =
+        input.value.trim();
+
+    if(text === ""){
+        return;
+    }
+
+    let date = new Date();
+
+    let time =
+        date.toLocaleTimeString([],{
+            hour:"2-digit",
+            minute:"2-digit"
+        });
+
+    messages.push({
+
+        sender:currentUser,
+
+        text:text,
+
+        time:time
+
+    });
+
+    input.value = "";
+
+    displayMessages();
+
+}
+
+
+/* DISPLAY */
+
+function displayMessages(){
+
+    let box =
+        document.getElementById("messages");
+
+    box.innerHTML = "";
+
+    messages.forEach(function(message){
+
+        let div =
+            document.createElement("div");
+
+        if(message.sender === currentUser){
+
+            div.className = "message right";
+
+        }else{
+
+            div.className = "message left";
+
+        }
+
+        div.innerHTML = `
+
+            <div class="name">
+                ${message.sender}
+            </div>
+
+            <div class="text">
+                ${escapeHTML(message.text)}
+            </div>
+
+            <div class="time">
+                ${message.time}
+            </div>
+
+        `;
+
+        box.appendChild(div);
+
+    });
+
+    box.scrollTop = box.scrollHeight;
+}
+
+
+/* ENTER TO SEND */
+
+document.getElementById(
+    "messageInput"
+).addEventListener(
+    "keydown",
+    function(event){
+
+        if(event.key === "Enter"){
+
+            sendMessage();
+
+        }
+
+    }
+);
+
+
+/* SECURITY */
+
+function escapeHTML(text){
+
+    let div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+}
+
+</script>
+
+</body>
+</html>
