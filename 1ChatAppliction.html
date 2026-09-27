@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Robot Chat</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#dfe5e8;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.chat-app{
+    width:95%;
+    max-width:700px;
+    height:92vh;
+    background:#efeae2;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 8px 30px rgba(0,0,0,.25);
+    display:flex;
+    flex-direction:column;
+}
+
+/* HEADER */
+
+.header{
+    background:#075e54;
+    color:white;
+    padding:14px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.robot{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.robot-icon{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background:#00a884;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:25px;
+}
+
+.robot-info h2{
+    font-size:17px;
+}
+
+.robot-info p{
+    font-size:12px;
+    color:#c9fff3;
+    margin-top:3px;
+}
+
+.header-buttons{
+    display:flex;
+    gap:7px;
+}
+
+.header-buttons button{
+    border:0;
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:17px;
+    background:rgba(255,255,255,.15);
+    color:white;
+}
+
+/* MESSAGES */
+
+.messages{
+    flex:1;
+    overflow-y:auto;
+    padding:20px;
+}
+
+.message{
+    max-width:75%;
+    padding:10px 13px;
+    border-radius:10px;
+    margin-bottom:12px;
+    word-wrap:break-word;
+}
+
+.bot{
+    background:white;
+    margin-right:auto;
+    border-top-left-radius:2px;
+}
+
+.user{
+    background:#d9fdd3;
+    margin-left:auto;
+    border-top-right-radius:2px;
+}
+
+.name{
+    font-size:12px;
+    font-weight:bold;
+    color:#008069;
+    margin-bottom:5px;
+}
+
+.text{
+    font-size:15px;
+    line-height:1.4;
+}
+
+.time{
+    text-align:right;
+    color:#777;
+    font-size:10px;
+    margin-top:5px;
+}
+
+/* TYPING */
+
+.typing{
+    background:white;
+    width:65px;
+    padding:10px;
+    border-radius:10px;
+    margin-bottom:12px;
+    display:none;
+}
+
+.typing span{
+    display:inline-block;
+    width:7px;
+    height:7px;
+    background:#777;
+    border-radius:50%;
+    margin:2px;
+    animation:bounce 1s infinite;
+}
+
+.typing span:nth-child(2){
+    animation-delay:.2s;
+}
+
+.typing span:nth-child(3){
+    animation-delay:.4s;
+}
+
+@keyframes bounce{
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-5px);
+    }
+
+}
+
+/* INPUT */
+
+.input-area{
+    background:#f0f2f5;
+    padding:12px;
+    display:flex;
+    gap:8px;
+    position:relative;
+}
+
+.emoji-button{
+    width:45px;
+    height:45px;
+    border:0;
+    border-radius:50%;
+    background:white;
+    cursor:pointer;
+    font-size:21px;
+}
+
+#messageInput{
+    flex:1;
+    border:0;
+    outline:0;
+    border-radius:25px;
+    padding:13px 17px;
+    font-size:15px;
+}
+
+.send{
+    width:48px;
+    height:48px;
+    border:0;
+    border-radius:50%;
+    background:#00a884;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.send:hover{
+    background:#008f72;
+}
+
+/* EMOJI */
+
+.emoji-box{
+    display:none;
+    position:absolute;
+    bottom:70px;
+    left:10px;
+    background:white;
+    padding:10px;
+    border-radius:12px;
+    width:230px;
+    box-shadow:0 5px 20px rgba(0,0,0,.2);
+}
+
+.emoji-box span{
+    font-size:23px;
+    cursor:pointer;
+    padding:5px;
+}
+
+/* DARK MODE */
+
+.dark{
+    background:#111;
+}
+
+.dark .chat-app{
+    background:#181818;
+}
+
+.dark .messages{
+    background:#181818;
+}
+
+.dark .bot{
+    background:#303030;
+    color:white;
+}
+
+.dark .input-area{
+    background:#222;
+}
+
+.dark #messageInput{
+    background:#333;
+    color:white;
+}
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+    body{
+        align-items:stretch;
+    }
+
+    .chat-app{
+        width:100%;
+        height:100vh;
+        border-radius:0;
+    }
+
+    .message{
+        max-width:85%;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="chat-app">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="robot">
+
+            <div class="robot-icon">
+                🤖
+            </div>
+
+            <div class="robot-info">
+
+                <h2>Robo Assistant</h2>
+
+                <p>
+                    🟢 Online • Always ready
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="header-buttons">
+
+            <button onclick="darkMode()">
+                🌙
+            </button>
+
+            <button onclick="clearChat()">
+                🗑️
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- CHAT -->
+
+    <div class="messages" id="messages">
+
+        <div class="message bot">
+
+            <div class="name">
+                🤖 Robo Assistant
+            </div>
+
+            <div class="text">
+                Hello! 👋 I'm Robo. How can I help you?
+            </div>
+
+            <div class="time">
+                Now
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TYPING -->
+
+    <div class="typing" id="typing">
+
+        <span></span>
+        <span></span>
+        <span></span>
+
+    </div>
+
+
+    <!-- INPUT -->
+
+    <div class="input-area">
+
+        <button
+            class="emoji-button"
+            onclick="showEmoji()">
+
+            😊
+
+        </button>
+
+        <input
+            type="text"
+            id="messageInput"
+            placeholder="Type a message..."
+            autocomplete="off"
+        >
+
+        <button
+            class="send"
+            onclick="sendMessage()">
+
+            ➤
+
+        </button>
+
+
+        <!-- EMOJI BOX -->
+
+        <div class="emoji-box" id="emojiBox">
+
+            <span onclick="addEmoji('😀')">😀</span>
+            <span onclick="addEmoji('😂')">😂</span>
+            <span onclick="addEmoji('😍')">😍</span>
+            <span onclick="addEmoji('😊')">😊</span>
+            <span onclick="addEmoji('😎')">😎</span>
+            <span onclick="addEmoji('❤️')">❤️</span>
+            <span onclick="addEmoji('👍')">👍</span>
+            <span onclick="addEmoji('🔥')">🔥</span>
+            <span onclick="addEmoji('🎉')">🎉</span>
+            <span onclick="addEmoji('🙏')">🙏</span>
+            <span onclick="addEmoji('🤣')">🤣</span>
+            <span onclick="addEmoji('🥳')">🥳</span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* VARIABLES */
+
+let messages =
+    JSON.parse(localStorage.getItem("robotChat")) || [];
+
+
+/* TIME */
+
+function getTime(){
+
+    let date = new Date();
+
+    return date.toLocaleTimeString([],{
+        hour:"2-digit",
+        minute:"2-digit"
+    });
+
+}
+
+
+/* ADD MESSAGE */
+
+function addMessage(sender,text){
+
+    let box =
+        document.getElementById("messages");
+
+    let message =
+        document.createElement("div");
+
+    message.className =
+        sender === "user"
+        ? "message user"
+        : "message bot";
+
+    let name =
+        sender === "user"
+        ? "You"
+        : "🤖 Robo Assistant";
+
+    message.innerHTML = `
+
+        <div class="name">
+            ${name}
+        </div>
+
+        <div class="text">
+            ${escapeHTML(text)}
+        </div>
+
+        <div class="time">
+            ${getTime()}
+        </div>
+
+    `;
+
+    box.appendChild(message);
+
+    box.scrollTop =
+        box.scrollHeight;
+
+}
+
+
+/* SEND */
+
+function sendMessage(){
+
+    let input =
+        document.getElementById("messageInput");
+
+    let text =
+        input.value.trim();
+
+    if(text === ""){
+        return;
+    }
+
+    addMessage("user",text);
+
+    messages.push({
+        sender:"user",
+        text:text
+    });
+
+    saveChat();
+
+    input.value="";
+
+    input.focus();
+
+    showTyping();
+
+    setTimeout(function(){
+
+        hideTyping();
+
+        let reply =
+            getBotReply(text);
+
+        addMessage("bot",reply);
+
+        messages.push({
+            sender:"bot",
+            text:reply
+        });
+
+        saveChat();
+
+    },800 + Math.random()*800);
+
+}
+
+
+/* ROBOT BRAIN */
+
+function getBotReply(message){
+
+    let text =
+        message.toLowerCase().trim();
+
+
+    /* HELLO */
+
+    if(
+        text.includes("hello") ||
+        text.includes("hi") ||
+        text.includes("hey") ||
+        text.includes("hii")
+    ){
+
+        return randomReply([
+
+            "Hello! 👋 How are you?",
+
+            "Hey! 😊 Nice to meet you.",
+
+            "Hi there! 🤖 How can I help you?",
+
+            "Hello bro! 😎 What are you doing?"
+
+        ]);
+
+    }
+
+
+    /* NAME */
+
+    if(
+        text.includes("your name") ||
+        text.includes("who are you")
+    ){
+
+        return "My name is Robo Assistant 🤖. I'm your virtual chat robot.";
+
+    }
+
+
+    /* HOW ARE YOU */
+
+    if(
+        text.includes("how are you") ||
+        text.includes("how r u")
+    ){
+
+        return randomReply([
+
+            "I'm doing great! 🤖 Thanks for asking.",
+
+            "I'm perfectly fine and ready to chat! 😄",
+
+            "I'm good! What about you?"
+
+        ]);
+
+    }
+
+
+    /* THANKS */
+
+    if(
+        text.includes("thank") ||
+        text.includes("thanks")
+    ){
+
+        return randomReply([
+
+            "You're welcome! 😊",
+
+            "No problem bro! 👍",
+
+            "Anytime! 🤖",
+
+            "Happy to help! ❤️"
+
+        ]);
+
+    }
+
+
+    /* JAVA */
+
+    if(
+        text.includes("java")
+    ){
+
+        return "Java is a popular object-oriented programming language. ☕";
+
+    }
+
+
+    /* HTML */
+
+    if(
+        text.includes("html")
+    ){
+
+        return "HTML is used to create the structure of websites. 🌐";
+
+    }
+
+
+    /* CSS */
+
+    if(
+        text.includes("css")
+    ){
+
+        return "CSS is used to style and design websites. 🎨";
+
+    }
+
+
+    /* JAVASCRIPT */
+
+    if(
+        text.includes("javascript") ||
+        text.includes("js")
+    ){
+
+        return "JavaScript makes websites interactive and dynamic. ⚡";
+
+    }
+
+
+    /* PROJECT */
+
+    if(
+        text.includes("project")
+    ){
+
+        return "I can help you create projects using HTML, CSS, JavaScript and Java. 💻";
+
+    }
+
+
+    /* LOVE */
+
+    if(
+        text.includes("love")
+    ){
+
+        return "Aww ❤️ That's sweet! I'm just a robot, but I enjoy chatting with you. 🤖";
+
+    }
+
+
+    /* GOOD */
+
+    if(
+        text.includes("good") ||
+        text.includes("great")
+    ){
+
+        return "That's great to hear! 😄";
+
+    }
+
+
+    /* BYE */
+
+    if(
+        text.includes("bye") ||
+        text.includes("goodbye")
+    ){
+
+        return "Goodbye! 👋 Come back anytime! 🤖";
+
+    }
+
+
+    /* HELP */
+
+    if(
+        text.includes("help")
+    ){
+
+        return "Sure! 😊 Tell me what you need help with.";
+
+    }
+
+
+    /* AGE */
+
+    if(
+        text.includes("how old are you") ||
+        text.includes("your age")
+    ){
+
+        return "I'm a digital robot, so I don't have a real age. 🤖";
+
+    }
+
+
+    /* DEFAULT */
+
+    return randomReply([
+
+        "Interesting! Tell me more. 🤔",
+
+        "I understand. 😊",
+
+        "That's nice! Tell me something else.",
+
+        "Hmm... I'm still learning. 🤖",
+
+        "Can you explain that a little more?",
+
+        "Okay! 👍 What would you like to talk about?",
+
+        "I'm listening. 👂",
+
+        "That sounds interesting! 😄"
+
+    ]);
+
+}
+
+
+/* RANDOM REPLY */
+
+function randomReply(array){
+
+    return array[
+        Math.floor(
+            Math.random()*array.length
+        )
+    ];
+
+}
+
+
+/* TYPING */
+
+function showTyping(){
+
+    document.getElementById(
+        "typing"
+    ).style.display="block";
+
+    let box =
+        document.getElementById("messages");
+
+    box.scrollTop =
+        box.scrollHeight;
+
+}
+
+
+function hideTyping(){
+
+    document.getElementById(
+        "typing"
+    ).style.display="none";
+
+}
+
+
+/* ENTER */
+
+document.getElementById(
+    "messageInput"
+).addEventListener(
+    "keydown",
+    function(event){
+
+        if(event.key === "Enter"){
+
+            sendMessage();
+
+        }
+
+    }
+);
+
+
+/* EMOJI */
+
+function showEmoji(){
+
+    let box =
+        document.getElementById("emojiBox");
+
+    box.style.display =
+        box.style.display === "block"
+        ? "none"
+        : "block";
+
+}
+
+
+function addEmoji(emoji){
+
+    let input =
+        document.getElementById("messageInput");
+
+    input.value += emoji;
+
+    input.focus();
+
+    document.getElementById(
+        "emojiBox"
+    ).style.display="none";
+
+}
+
+
+/* DARK MODE */
+
+function darkMode(){
+
+    document.body.classList.toggle("dark");
+
+}
+
+
+/* CLEAR CHAT */
+
+function clearChat(){
+
+    if(confirm("Delete complete chat?")){
+
+        localStorage.removeItem("robotChat");
+
+        location.reload();
+
+    }
+
+}
+
+
+/* SAVE */
+
+function saveChat(){
+
+    localStorage.setItem(
+        "robotChat",
+        JSON.stringify(messages)
+    );
+
+}
+
+
+/* SECURITY */
+
+function escapeHTML(text){
+
+    let div =
+        document.createElement("div");
+
+    div.textContent=text;
+
+    return div.innerHTML;
+
+}
+
+</script>
+
+</body>
+</html>
